@@ -1,21 +1,21 @@
 import discord
 from discord.ext import commands
+import json
+
+default_prefix = ''
+prefix_json = None
+with open('prefix.json',encoding='UTF-8') as f:
+    prefix_json = json.load(f)
+print(prefix_json)
 
 
-prefix_dict = {}
-default_prefix = '/'
-prefix_list = [default_prefix]
-bot = commands.Bot(command_prefix=prefix_list,intents=discord.Intents.all())
+def custom_prefix(bot:commands.Bot,msg:discord.Message):
+    if str(msg.guild.id) in prefix_json.keys():
+        return prefix_json[str(msg.guild.id)]
+    else:
+        return default_prefix
 
-'''
-必須コード
-
-if ctx.guild.id in prefix_dict.keys():
-    if not ctx.prefix == prefix_dict[ctx.guild.id]:
-        return
-if not ctx.guild.id in prefix_dict.keys() and not ctx.prefix == default_prefix:
-    return
-'''
+bot = commands.Bot(command_prefix=custom_prefix,intents=discord.Intents.all())
 
 TOKEN = ''
 
@@ -25,40 +25,23 @@ async def on_ready():
 
 @bot.command()
 async def test(ctx):
-    if ctx.guild.id in prefix_dict.keys():
-        if not ctx.prefix == prefix_dict[ctx.guild.id]:
-            return
-    if not ctx.guild.id in prefix_dict.keys() and not ctx.prefix == default_prefix:
-        return
-
     await ctx.send('success')
     return
 
 @bot.command(aliases=['cp'])
 async def change_prefix(ctx, new_prefix:str):
-    if ctx.prefix in prefix_list:
-        if ctx.guild.id in prefix_dict.keys():
-            if ctx.prefix == prefix_dict[ctx.guild.id]:
-                prefix_list.remove(prefix_dict[ctx.guild.id])
-                prefix_list.append(new_prefix)
-
-                prefix_dict.pop(ctx.guild.id)
-                prefix_dict[ctx.guild.id] = new_prefix
-
-                bot.command_prefix = prefix_list
-
-                print(f'{ctx.guild.name}のcustom prefixが{prefix_dict[ctx.guild.id]}に変更されました')
-                return
-            else:
-                return
-
-    if not ctx.prefix in prefix_dict.values() and ctx.prefix == default_prefix:
-        prefix_list.append(new_prefix)
-        prefix_dict[ctx.guild.id] = new_prefix
-
-        bot.command_prefix = prefix_list
-
-        print(f'{ctx.guild.name}のcustom prefixが{prefix_dict[ctx.guild.id]}に変更されました')
+    if str(ctx.message.guild.id) in prefix_json.keys():
+        prefix_json.pop(str(ctx.message.guild.id))
+        prefix_json[str(ctx.message.guild.id)] = new_prefix
+        with open('prefix.json','w',encoding='UTF-8') as f:
+            f.write(str(prefix_json).replace('\'','\"'))
+        print(f'{ctx.message.guild.name} のprefixが{prefix_json[str(ctx.message.guild.id)]}に変更されました')
+        return
+    else:
+        prefix_json[str(ctx.message.guild.id)] = new_prefix
+        with open('prefix.json','w',encoding='UTF-8') as f:
+            f.write(str(prefix_json).replace('\'','\"'))
+        print(f'{ctx.message.guild.name} のprefixが{prefix_json[str(ctx.message.guild.id)]}に変更されました')
         return
 
 bot.run(TOKEN)
