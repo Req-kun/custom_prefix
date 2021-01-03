@@ -56,14 +56,14 @@ async def change_prefix(ctx, new_prefix: str):
         prefix_json.pop(str(ctx.message.guild.id))
         prefix_json[str(ctx.message.guild.id)] = new_prefix
         with open('prefix.json', 'w', encoding='UTF-8') as f:
-            f.write(str(prefix_json).replace('\'', '\"'))
+            f.write(json.dumps(prefix_json))
         print(
             f'{ctx.message.guild.name} のprefixが{prefix_json[str(ctx.message.guild.id)]}に変更されました')
         return
     else:
         prefix_json[str(ctx.message.guild.id)] = new_prefix
         with open('prefix.json', 'w', encoding='UTF-8') as f:
-            f.write(str(prefix_json).replace('\'', '\"'))
+            f.write(json.dumps(prefix_json))
         print(
             f'{ctx.message.guild.name} のprefixが{prefix_json[str(ctx.message.guild.id)]}に変更されました')
         return
