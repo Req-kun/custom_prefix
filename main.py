@@ -1,20 +1,3 @@
-import discord
-from discord.ext import commands
-import json
-
-default_prefix = ''
-prefix_json = None
-with open('prefix.json',encoding='UTF-8') as f:
-    prefix_json = json.load(f)
-print(prefix_json)
-
-
-def custom_prefix(bot:commands.Bot,msg:discord.Message):
-    if str(msg.guild.id) in prefix_json.keys():
-        return prefix_json[str(msg.guild.id)]
-    else:
-        return default_prefix
-
 import json
 
 import discord
@@ -69,4 +52,3 @@ async def change_prefix(ctx, new_prefix: str):
         return
 
 bot.run(TOKEN)
-
