@@ -3,7 +3,6 @@ import json
 import discord
 from discord.ext import commands
 
-
 # 必須の変数の設定
 default_prefix = 'ここにデフォルトとするprefixを入力'
 TOKEN = 'ここにTOKENを入力'
